@@ -19,16 +19,12 @@ Or if you prefer thing the hard way:
 2. You will need [PyLyrics](https://pypi.python.org/pypi/PyLyrics/1.1.0)
 
   `pip install PyLyrics`
-  
-3. And Pmw
 
-  `pip install Pmw`
+3. Run your main Spotify program
 
-4. Run your main Spotify program
+4. Run the `spotilyrics.py` script
 
-5. Run the `spotilyrics.py` script
-
-6. Enjoy your lyrics!
+5. Enjoy your lyrics!
 
 ---
 
