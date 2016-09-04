@@ -37,6 +37,6 @@ Or if you prefer thing the hard way:
 ---
 
 ### Thanks and Credits
-* Thanks to [XanderMJ](https://github.com/XanderMJ/) for creating the great [spotilib](https://github.com/XanderMJ/spotilib) which without it this project wouldn't be possibel
+* Thanks to [XanderMJ](https://github.com/XanderMJ/) for creating the great [spotilib](https://github.com/XanderMJ/spotilib) which without it this project wouldn't be possible
 * Thanks to [Ernesto Savoretti](https://sourceforge.net/u/sandy2008/) for fixig the [pmwbundle.py](https://sourceforge.net/p/pmw/discussion/131281/thread/24235048/) code and posting it on some obscure sourceforge thread.
 * Icon made by Freepik from www.flaticon.com
