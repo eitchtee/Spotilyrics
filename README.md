@@ -35,5 +35,6 @@ Or if you prefer thing the hard way:
 
 ### To-Do
 * Make the overall app look nicer
-* Compile .exe files
+* ~~Compile .exe files~~
 * Add other ways than PyLyrics to find lyrics, in case that fails to find what you want
+* Add an icon
