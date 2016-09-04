@@ -24,6 +24,10 @@ def get_lyrics(old_song=None, old_artist=None):
             song_title.set('Nada tocando')
             # Changes the artist title on the upper part of the window
             artist_title.set('no momento')
+            # Set program title
+            master.title('Nada tocando no momento')
+            # Set the play/pause button to play option
+            play_button.set('▶')
             # Set the old_song and old_artist variable to check for changes
             old_song = song
             old_artist = artist
@@ -40,6 +44,10 @@ def get_lyrics(old_song=None, old_artist=None):
             song_title.set(song)
             # Changes the artist title on the upper part of the window
             artist_title.set(artist)
+            # Set program title
+            master.title('{0} - {1}'.format(song, artist))
+            # Set the play/pause button to play option
+            play_button.set('⏸')
             # Set the old_song and old_artist variable to check for changes
             old_song = song
             old_artist = artist
@@ -58,6 +66,10 @@ def get_lyrics(old_song=None, old_artist=None):
         song_title.set(song)
         # Changes the artist title on the upper part of the window
         artist_title.set(artist)
+        # Set program title
+        master.title('{0} - {1}'.format(song, artist))
+        # Set the play/pause button to play option
+        play_button.set('⏸')
         # Set the old_song and old_artist variable to check for changes
         old_song = song
         old_artist = artist
@@ -68,11 +80,28 @@ def get_lyrics(old_song=None, old_artist=None):
 
 # creates the main window
 master = Tk()
-# makes it unresizeable
-master.resizable(width=False, height=False)
+# -------------- SET POSITION OF THE WINDOW --------------
+w = 430  # width for the Tk root
+h = 577  # height for the Tk root
+
+# get screen width and height
+ws = master.winfo_screenwidth()  # width of the screen
+hs = master.winfo_screenheight()  # height of the screen
+
+# calculate x and y coordinates for the Tk root window
+x = (ws/2) - (w/2)
+y = (hs/2) - (h/2)
+
+# set the dimensions of the screen
+# and where it is placed
+master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+# ---------------------------------------------------------
+
 # creates the variables for the song title and artist title on the upper part
+# and the play/pause button
 song_title = StringVar()
 artist_title = StringVar()
+play_button = StringVar()
 # Frame for the tiles
 title = Frame(master)
 # frame for the controls
@@ -85,18 +114,17 @@ Message(title, textvariable=song_title,
 Message(title, textvariable=artist_title,
         font='arial 11 bold', width=440).grid()
 # Button for previous song
-Button(controls, text='<<', command=spotilib.previous).grid(
+Button(controls, text='⏮', command=spotilib.previous).grid(
     sticky='n', row=0, column=0)
 # Button for pausing/playing song
-# TO-DO: Make it change based on the current status
-Button(controls, text='||', command=spotilib.pause).grid(
+Button(controls, textvariable=play_button, command=spotilib.pause).grid(
     sticky='n', row=0, column=1)
 # Button for the next song
-Button(controls, text='>>', command=spotilib.next).grid(
+Button(controls, text='⏭', command=spotilib.next).grid(
     sticky='n', row=0, column=2)
 # Creates the Text widget for the lyrics
 lyric_space = Pmw.ScrolledText(
-    master, usehullsize=1, hull_width=430, hull_height=600)
+    master)  # usehullsize=1, hull_width=430, hull_height=500)
 # Configures the Lyric Text as follows:
 # Disable typing
 # Changes the background for the window background
@@ -107,11 +135,12 @@ lyric_space.configure(text_state='disabled', text_bg=master.cget(
 lyric_space.tag_configure('center', justify='center')
 
 # Places all the gui items on the window
-title.grid()
-controls.grid()
-lyric_space.grid()
+title.pack()
+controls.pack()
+lyric_space.pack(expand=True, fill='both')
 
 # Starts the function to get the lyrics and its loop
 get_lyrics()
+
 # tkinter mainloop
 master.mainloop()
