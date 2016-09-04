@@ -141,8 +141,10 @@ controls.pack()
 lyric_space.pack(expand=True, fill='both')
 
 # Icon support
-img = Image("photo", file=os.getcwd() + "/lyrics.png")
-master.tk.call('wm', 'iconphoto', master._w, img)
+if os.path.isfile(os.getcwd()+'/lyrics.png'):
+    print('file found')
+    img = Image("photo", file=os.getcwd() + "/lyrics.png")
+    master.tk.call('wm', 'iconphoto', master._w, img)
 
 # Starts the function to get the lyrics and its loop
 get_lyrics()
