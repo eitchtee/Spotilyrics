@@ -2,6 +2,7 @@ import spotilib
 from PyLyrics import *
 from tkinter import *
 import Pmw
+import os
 
 
 # Main function to get the lyrics(for now)
@@ -138,6 +139,10 @@ lyric_space.tag_configure('center', justify='center')
 title.pack()
 controls.pack()
 lyric_space.pack(expand=True, fill='both')
+
+# Icon support
+img = Image("photo", file=os.getcwd() + "/lyrics.png")
+master.tk.call('wm', 'iconphoto', master._w, img)
 
 # Starts the function to get the lyrics and its loop
 get_lyrics()
