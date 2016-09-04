@@ -16,7 +16,7 @@ Or if you prefer thing the hard way:
 
 1. You will need Python 3.5(this is the version it is developed and tested on, altough it may work on Python 3.x)
 
-2. You will need [PyLyric](https://pypi.python.org/pypi/PyLyrics/1.1.0)
+2. You will need [PyLyrics](https://pypi.python.org/pypi/PyLyrics/1.1.0)
 
   `pip install PyLyrics`
   
