@@ -4,16 +4,6 @@ from tkinter import *
 import Pmw
 import os
 
-# For handling pyinstaller paths
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
 
 # Main function to get the lyrics(for now)
 # TO-DO: Add another website for searching for lyrics
@@ -151,8 +141,9 @@ controls.pack()
 lyric_space.pack(expand=True, fill='both')
 
 # Icon support
-if os.path.isfile(resource_path('lyrics.png')):
-    img = Image("photo", file=resource_path('lyrics.png'))
+if os.path.isfile(os.getcwd()+'/lyrics.png'):
+    print('file found')
+    img = Image("photo", file=os.getcwd() + "/lyrics.png")
     master.tk.call('wm', 'iconphoto', master._w, img)
 
 # Starts the function to get the lyrics and its loop
