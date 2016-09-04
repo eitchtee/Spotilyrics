@@ -17,15 +17,15 @@ def get_lyrics(old_song=None, old_artist=None):
         if (artist == 'There is noting playing at this moment') or (
                 song == 'There is noting playing at this moment'):
             # Then set the lyric to tell the user about it
-            lyric_space.setvalue('Nada tocando no momento!')
+            lyric_space.setvalue('There is noting playing at this moment')
             # centralizes the Lyric Text using a tag
             lyric_space.tag_add("center", 1.0, "end")
             # Changes the song title on the upper part of the window
-            song_title.set('Nada tocando')
+            song_title.set('There is noting playing')
             # Changes the artist title on the upper part of the window
-            artist_title.set('no momento')
+            artist_title.set('at this moment')
             # Set program title
-            master.title('Nada tocando no momento')
+            master.title(song)
             # Set the play/pause button to play option
             play_button.set('▶')
             # Set the old_song and old_artist variable to check for changes
@@ -59,7 +59,7 @@ def get_lyrics(old_song=None, old_artist=None):
     # if the PyLyrics module fails to get the lyric
     except ValueError:
         # warns the user on the lyric text about the failure
-        lyric_space.setvalue('Música não encontrada!')
+        lyric_space.setvalue('Lyric not found!')
         # centralizes the Lyric Text using a tag
         lyric_space.tag_add("center", 1.0, "end")
         # Changes the song title on the upper part of the window
@@ -89,8 +89,8 @@ ws = master.winfo_screenwidth()  # width of the screen
 hs = master.winfo_screenheight()  # height of the screen
 
 # calculate x and y coordinates for the Tk root window
-x = (ws/2) - (w/2)
-y = (hs/2) - (h/2)
+x = (ws / 2) - (w / 2)
+y = (hs / 2) - (h / 2)
 
 # set the dimensions of the screen
 # and where it is placed
@@ -124,7 +124,7 @@ Button(controls, text='⏭', command=spotilib.next).grid(
     sticky='n', row=0, column=2)
 # Creates the Text widget for the lyrics
 lyric_space = Pmw.ScrolledText(
-    master)  # usehullsize=1, hull_width=430, hull_height=500)
+    master)
 # Configures the Lyric Text as follows:
 # Disable typing
 # Changes the background for the window background
