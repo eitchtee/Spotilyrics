@@ -17,13 +17,11 @@ While there are no binaries for ease of use, you'll have to do the following:
 
   `pip install PyLyrics`
 
-2. Get the `spotilib.py` file from [here](https://github.com/XanderMJ/spotilib), and place it on the same folder as our script.
+2. Run your main Spotify program.
 
-3. Run your main Spotify program.
+3. Run the `spotilyrics.py` script.
 
-4. Run the `spotilyrics.py` script.
-
-5. Enjoy your lyrics.
+4. Enjoy your lyrics.
 
 ---
 
