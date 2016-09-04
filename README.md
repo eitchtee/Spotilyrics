@@ -11,17 +11,25 @@ With the removal of the Lyrics feature from Spotify, i've decided to hack togeth
 ---
 
 ### How to Install
-While there are no binaries for ease of use, you'll have to do the following:
+**You can just download the executable [here](https://github.com/eitchtee/Spotilyrics/releases/latest)**
 
-1. You will need [PyLyric](https://pypi.python.org/pypi/PyLyrics/1.1.0)
+Or if you prefer thing the hard way:
+
+1. You will need Python 3.5(this is the version it is developed and tested on, altough it may work on Python 3.x)
+
+2. You will need [PyLyric](https://pypi.python.org/pypi/PyLyrics/1.1.0)
 
   `pip install PyLyrics`
+  
+3. And Pmw
 
-2. Run your main Spotify program.
+  `pip install Pmw`
 
-3. Run the `spotilyrics.py` script.
+4. Run your main Spotify program
 
-4. Enjoy your lyrics.
+5. Run the `spotilyrics.py` script
+
+6. Enjoy your lyrics!
 
 ---
 
