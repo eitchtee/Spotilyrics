@@ -50,6 +50,7 @@ import traceback
 import types
 import tkinter
 import collections
+from tkinter import ttk
 
 # tkinter 8.5 -> 8.6 fixed a problem in which selected indexes
 # were reported as strings instead of ints
@@ -1891,7 +1892,7 @@ class _ErrorWindow:
         # Create the text widget and scrollbar in a frame
         upperframe = tkinter.Frame(self._top)
 
-        scrollbar = tkinter.Scrollbar(upperframe, orient='vertical')
+        scrollbar = ttk.Scrollbar(upperframe, orient='vertical')
         scrollbar.pack(side = 'right', fill = 'y')
 
         self._text = tkinter.Text(upperframe, yscrollcommand=scrollbar.set)
@@ -2024,6 +2025,10 @@ class ScrolledText(Pmw.MegaWidget):
         Pmw.MegaWidget.__init__(self, parent)
 
         # Create the components.
+        style = ttk.Style()
+        style.configure("Spotilyrics.Vertical.TScrollbar", foreground="white", background="black")
+
+        
         interior = self.interior()
 
         if self['usehullsize']:
@@ -2108,7 +2113,7 @@ class ScrolledText(Pmw.MegaWidget):
         # Create the horizontal scrollbar
         self._horizScrollbar = self.createcomponent('horizscrollbar',
                 (), 'Scrollbar',
-                tkinter.Scrollbar, (interior,),
+                ttk.Scrollbar, (interior,),
                 orient='horizontal',
                 command=self._textbox.xview
         )
@@ -2116,7 +2121,7 @@ class ScrolledText(Pmw.MegaWidget):
         # Create the vertical scrollbar
         self._vertScrollbar = self.createcomponent('vertscrollbar',
                 (), 'Scrollbar',
-                tkinter.Scrollbar, (interior,),
+                ttk.Scrollbar, (interior,),
                 orient='vertical',
                 command=self._textbox.yview
         )

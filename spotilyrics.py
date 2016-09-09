@@ -15,14 +15,14 @@ def get_lyrics(old_song=None, old_artist=None):
     song = spotilib.song()
     try:
         # Checks if there is nothing playing
-        if (artist == 'There is noting playing at this moment') or (
-                song == 'There is noting playing at this moment'):
+        if (artist == 'There is nothing playing at this moment') or (
+                song == 'There is nothing playing at this moment'):
             # Then set the lyric to tell the user about it
-            lyric_space.setvalue('There is noting playing at this moment')
+            lyric_space.setvalue('There is nothing playing at this moment')
             # centralizes the Lyric Text using a tag
-            lyric_space.tag_add("center", 1.0, "end")
+            lyric_space.tag_add("config", 1.0, "end")
             # Changes the song title on the upper part of the window
-            song_title.set('There is noting playing')
+            song_title.set('There is nothing playing')
             # Changes the artist title on the upper part of the window
             artist_title.set('at this moment')
             # Set program title
@@ -35,12 +35,7 @@ def get_lyrics(old_song=None, old_artist=None):
         # checks if the old_song or old_artist variable are different
         # from the current one
         elif old_song != song or old_artist != artist:
-            # then try to get the lyric with that info
-            lyrics = PyLyrics.getLyrics(artist, song)
-            # Changes the lyric text to the current lyric
-            lyric_space.setvalue(lyrics)
-            # centralizes the Lyric Text using a tag
-            lyric_space.tag_add("center", 1.0, "end")
+            master.update()
             # Changes the song title on the upper part of the window
             song_title.set(song)
             # Changes the artist title on the upper part of the window
@@ -49,6 +44,17 @@ def get_lyrics(old_song=None, old_artist=None):
             master.title('{0} - {1}'.format(song, artist))
             # Set the play/pause button to play option
             play_button.set('⏸')
+            # Placeholder while system searchs for lyric
+            lyric_space.setvalue('Searching...')
+            lyric_space.tag_add("config", 1.0, "end")
+            # updates the window
+            master.update()
+            # then try to get the lyric with that info
+            lyrics = PyLyrics.getLyrics(artist, song)
+            # Changes the lyric text to the current lyric
+            lyric_space.setvalue(lyrics)
+            # centralizes the Lyric Text using a tag
+            lyric_space.tag_add("config", 1.0, "end")
             # Set the old_song and old_artist variable to check for changes
             old_song = song
             old_artist = artist
@@ -59,10 +65,7 @@ def get_lyrics(old_song=None, old_artist=None):
             old_artist = artist
     # if the PyLyrics module fails to get the lyric
     except ValueError:
-        # warns the user on the lyric text about the failure
-        lyric_space.setvalue('Lyric not found!')
-        # centralizes the Lyric Text using a tag
-        lyric_space.tag_add("center", 1.0, "end")
+        master.update()
         # Changes the song title on the upper part of the window
         song_title.set(song)
         # Changes the artist title on the upper part of the window
@@ -71,6 +74,15 @@ def get_lyrics(old_song=None, old_artist=None):
         master.title('{0} - {1}'.format(song, artist))
         # Set the play/pause button to play option
         play_button.set('⏸')
+        # Placeholder while system searchs for lyric
+        lyric_space.setvalue('Searching...')
+        lyric_space.tag_add("config", 1.0, "end")
+        # updates the window
+        master.update()
+        # warns the user on the lyric text about the failure
+        lyric_space.setvalue('Lyric not found!')
+        # centralizes the Lyric Text using a tag
+        lyric_space.tag_add("config", 1.0, "end")
         # Set the old_song and old_artist variable to check for changes
         old_song = song
         old_artist = artist
@@ -81,6 +93,12 @@ def get_lyrics(old_song=None, old_artist=None):
 
 # creates the main window
 master = Tk()
+master.configure(background='#282828')
+# Icon support
+if os.path.isfile(os.getcwd() + '/lyrics.png'):
+    print('file found')
+    img = Image("photo", file=os.getcwd() + "/lyrics.png")
+    master.tk.call('wm', 'iconphoto', master._w, img)
 # -------------- SET POSITION OF THE WINDOW --------------
 w = 430  # width for the Tk root
 h = 577  # height for the Tk root
@@ -105,24 +123,52 @@ artist_title = StringVar()
 play_button = StringVar()
 # Frame for the tiles
 title = Frame(master)
+title.configure(background='#282828')
 # frame for the controls
 controls = Frame(master)
+controls.configure(background='#282828')
 
 # Creates the Song Title text
-Message(title, textvariable=song_title,
-        font='arial 11 bold', width=440).grid()
+Message(title, textvariable=song_title, font='arial 11 bold',
+        background='#282828', foreground='white', width=440).grid()
 # Creates the Artist Title text
-Message(title, textvariable=artist_title,
-        font='arial 11 bold', width=440).grid()
+Message(title, textvariable=artist_title, font='arial 11 bold',
+        background='#282828', foreground='white', width=440).grid()
 # Button for previous song
-Button(controls, text='⏮', command=spotilib.previous).grid(
-    sticky='n', row=0, column=0)
+Button(controls,
+       text='⏮',
+       relief='flat',
+       activebackground='#282828',
+       activeforeground='#1DB954',
+       bg='#282828',
+       fg='#1DB954',
+       bd=0,
+       font='arial 11',
+       command=spotilib.previous
+       ).grid(sticky='n', row=0, column=0)
 # Button for pausing/playing song
-Button(controls, textvariable=play_button, command=spotilib.pause).grid(
-    sticky='n', row=0, column=1)
+Button(controls,
+       textvariable=play_button,
+       relief='flat', activebackground='#282828',
+       activeforeground='#1DB954',
+       bg='#282828',
+       fg='#1DB954',
+       font='arial 11',
+       bd=0,
+       command=spotilib.pause
+       ).grid(sticky='n', row=0, column=1)
 # Button for the next song
-Button(controls, text='⏭', command=spotilib.next).grid(
-    sticky='n', row=0, column=2)
+Button(controls,
+       text='⏭',
+       relief='flat',
+       activebackground='#282828',
+       activeforeground='#1DB954',
+       bg='#282828',
+       fg='#1DB954',
+       bd=0,
+       font='arial 11',
+       command=spotilib.next
+       ).grid(sticky='n', row=0, column=2)
 # Creates the Text widget for the lyrics
 lyric_space = Pmw.ScrolledText(
     master)
@@ -130,21 +176,24 @@ lyric_space = Pmw.ScrolledText(
 # Disable typing
 # Changes the background for the window background
 # Wraps the text on words, if it doesn't fit
-lyric_space.configure(text_state='disabled', text_bg=master.cget(
-    'bg'), text_wrap='word')
+lyric_space.configure(
+    text_state='disabled', text_bg='#282828', text_wrap='word')
 # Creates the tag to centralize the lyrics
-lyric_space.tag_configure('center', justify='center')
+lyric_space.tag_configure('config',
+                          justify='center',
+                          foreground='white',
+                          font='arial 10')
+# Config button
+'''
+config_button = Label(controls, text='⚙', font='arial 11',
+                      fg='#1DB954', bg='#282828')
+config_button.grid(sticky='n', row=0, column=4)
+'''
 
 # Places all the gui items on the window
 title.pack()
 controls.pack()
 lyric_space.pack(expand=True, fill='both')
-
-# Icon support
-if os.path.isfile(os.getcwd()+'/lyrics.png'):
-    print('file found')
-    img = Image("photo", file=os.getcwd() + "/lyrics.png")
-    master.tk.call('wm', 'iconphoto', master._w, img)
 
 # Starts the function to get the lyrics and its loop
 get_lyrics()

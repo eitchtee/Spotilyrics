@@ -31,7 +31,7 @@ def artist():
         artist = artist.strip()
         return artist
     except:
-        return "There is noting playing at this moment"
+        return "There is nothing playing at this moment"
 
 
 def song():
@@ -41,7 +41,7 @@ def song():
         song = song.strip()
         return song
     except:
-        return "There is noting playing at this moment"
+        return "There is nothing playing at this moment"
 
 ###SpotifyBlock###
 
