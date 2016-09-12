@@ -1,8 +1,10 @@
+#-*- coding: utf-8 -*-
 import spotilib
 from PyLyrics import *
 from tkinter import *
 import Pmw
 import os
+import platform
 
 
 # Main function to get the lyrics(for now)
@@ -28,7 +30,7 @@ def get_lyrics(old_song=None, old_artist=None):
             # Set program title
             master.title(song)
             # Set the play/pause button to play option
-            play_button.set('▶')
+            play_button_text.set('\u25B6')
             # Set the old_song and old_artist variable to check for changes
             old_song = song
             old_artist = artist
@@ -43,7 +45,7 @@ def get_lyrics(old_song=None, old_artist=None):
             # Set program title
             master.title('{0} - {1}'.format(song, artist))
             # Set the play/pause button to play option
-            play_button.set('⏸')
+            play_button_text.set('\u23F8')
             # Placeholder while system searchs for lyric
             lyric_space.setvalue('Searching...')
             lyric_space.tag_add("config", 1.0, "end")
@@ -73,7 +75,7 @@ def get_lyrics(old_song=None, old_artist=None):
         # Set program title
         master.title('{0} - {1}'.format(song, artist))
         # Set the play/pause button to play option
-        play_button.set('⏸')
+        play_button_text.set('\u23F8')
         # Placeholder while system searchs for lyric
         lyric_space.setvalue('Searching...')
         lyric_space.tag_add("config", 1.0, "end")
@@ -90,6 +92,7 @@ def get_lyrics(old_song=None, old_artist=None):
         pass
     # Repeats this function every 1 second(1000ms)
     master.after(1000, get_lyrics, old_song, old_artist)
+
 
 # creates the main window
 master = Tk()
@@ -120,7 +123,7 @@ master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 # and the play/pause button
 song_title = StringVar()
 artist_title = StringVar()
-play_button = StringVar()
+play_button_text = StringVar()
 # Frame for the tiles
 title = Frame(master)
 title.configure(background='#282828')
@@ -135,43 +138,48 @@ Message(title, textvariable=song_title, font='arial 11 bold',
 Message(title, textvariable=artist_title, font='arial 11 bold',
         background='#282828', foreground='white', width=440).grid()
 # Button for previous song
-Button(controls,
-       text='⏮',
-       relief='flat',
-       activebackground='#282828',
-       activeforeground='#1DB954',
-       bg='#282828',
-       fg='#1DB954',
-       bd=0,
-       font='arial 11',
-       command=spotilib.previous
-       ).grid(sticky='n', row=0, column=0)
+previous_button = Button(controls,
+                         text='\u23EE',
+                         relief='flat',
+                         activebackground='#282828',
+                         activeforeground='#1DB954',
+                         bg='#282828',
+                         fg='#1DB954',
+                         bd=0,
+                         font='arial 11',
+                         command=spotilib.previous
+                         )
 # Button for pausing/playing song
-Button(controls,
-       textvariable=play_button,
-       relief='flat', activebackground='#282828',
-       activeforeground='#1DB954',
-       bg='#282828',
-       fg='#1DB954',
-       font='arial 11',
-       bd=0,
-       command=spotilib.pause
-       ).grid(sticky='n', row=0, column=1)
+play_button = Button(controls,
+                     textvariable=play_button_text,
+                     relief='flat', activebackground='#282828',
+                     activeforeground='#1DB954',
+                     bg='#282828',
+                     fg='#1DB954',
+                     font='arial 11',
+                     bd=0,
+                     command=spotilib.pause
+                     )
 # Button for the next song
-Button(controls,
-       text='⏭',
-       relief='flat',
-       activebackground='#282828',
-       activeforeground='#1DB954',
-       bg='#282828',
-       fg='#1DB954',
-       bd=0,
-       font='arial 11',
-       command=spotilib.next
-       ).grid(sticky='n', row=0, column=2)
+next_button = Button(controls,
+                     text='\u23ED',
+                     relief='flat',
+                     activebackground='#282828',
+                     activeforeground='#1DB954',
+                     bg='#282828',
+                     fg='#1DB954',
+                     bd=0,
+                     font='arial 11',
+                     command=spotilib.next
+                     )
+# Only places the controls buttons if the system is windows based
+if platform.system() == 'Windows':
+    previous_button.grid(sticky='n', row=0, column=0)
+    play_button.grid(sticky='n', row=0, column=1)
+    next_button.grid(sticky='n', row=0, column=2)
+
 # Creates the Text widget for the lyrics
-lyric_space = Pmw.ScrolledText(
-    master)
+lyric_space = Pmw.ScrolledText(master)
 # Configures the Lyric Text as follows:
 # Disable typing
 # Changes the background for the window background

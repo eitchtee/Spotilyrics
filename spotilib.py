@@ -1,7 +1,10 @@
-import win32gui
-import win32api
 import os
-
+import platform
+if platform.system() == 'Windows':
+    import win32gui
+    import win32api
+elif platform.system() == 'Linux':
+    import dbus
 
 ###Virtual-KeyCodes###
 Media_Next = 0xB0
@@ -11,6 +14,28 @@ Media_Mute = 0xAD
 
 
 ###SpotifyInfo###
+def song_info_linux():
+    session_bus = dbus.SessionBus()
+    spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
+                                     "/org/mpris/MediaPlayer2")
+    spotify_properties = dbus.Interface(spotify_bus,
+                                    "org.freedesktop.DBus.Properties")
+    metadata = spotify_properties.Get("org.mpris.MediaPlayer2.Player", "Metadata")
+    song_info = metadata['sexam:title']
+    return song_info
+
+
+def artist_info_linux():
+    session_bus = dbus.SessionBus()
+    spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
+                                     "/org/mpris/MediaPlayer2")
+    spotify_properties = dbus.Interface(spotify_bus,
+                                    "org.freedesktop.DBus.Properties")
+    metadata = spotify_properties.Get("org.mpris.MediaPlayer2.Player", "Metadata")
+    artist_info = metadata['xesam:artist'][0]
+    return artist_info
+
+
 def getwindow(Title="SpotifyMainWindow"):
     window_id = win32gui.FindWindow(Title, None)
     return window_id
@@ -25,23 +50,35 @@ def song_info():
 
 
 def artist():
-    try:
-        temp = song_info()
-        artist, song = temp.split("-", 1)
-        artist = artist.strip()
-        return artist
-    except:
-        return "There is nothing playing at this moment"
+    if platform.system() == 'Windows':
+        try:
+            temp = song_info()
+            artist, song = temp.split("-", 1)
+            artist = artist.strip()
+            return artist
+        except:
+            return "There is nothing playing at this moment"
+    elif platform.system() == 'Linux':
+        try:
+            return artist_info_linux()
+        except DBusException:
+            return "There is nothing playing at this moment"
 
 
 def song():
-    try:
-        temp = song_info()
-        artist, song = temp.split("-", 1)
-        song = song.strip()
-        return song
-    except:
-        return "There is nothing playing at this moment"
+    if platform.system() == 'Windows': 
+        try:
+            temp = song_info()
+            artist, song = temp.split("-", 1)
+            song = song.strip()
+            return song
+        except:
+            return "There is nothing playing at this moment"
+    elif platform.system() == 'Linux':
+        try:
+            return artist_info_linux()
+        except DBusException:
+            return "There is nothing playing at this moment"
 
 ###SpotifyBlock###
 
