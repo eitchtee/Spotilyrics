@@ -5,7 +5,8 @@ With the removal of the Lyrics feature from Spotify, i've decided to hack togeth
 ---
 ### Warnings
 
-* Currently this script is WINDOWS only
+* ~~Currently this script is WINDOWS only~~
+* This is Windows and Linux only
 
 ---
 
