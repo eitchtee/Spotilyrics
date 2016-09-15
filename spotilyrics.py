@@ -1,10 +1,10 @@
-#-*- coding: utf-8 -*-
 import spotilib
 from PyLyrics import *
 from tkinter import *
 import Pmw
 import os
 import platform
+import get_lyrics as lyric
 
 
 # Main function to get the lyrics(for now)
@@ -15,57 +15,65 @@ def get_lyrics(old_song=None, old_artist=None):
     artist = spotilib.artist()
     # Gets song name from spotilib and stores it in the song var
     song = spotilib.song()
-    try:
-        # Checks if there is nothing playing
-        if (artist == 'There is nothing playing at this moment') or (
-                song == 'There is nothing playing at this moment'):
-            # Then set the lyric to tell the user about it
-            lyric_space.setvalue('There is nothing playing at this moment')
-            # centralizes the Lyric Text using a tag
-            lyric_space.tag_add("config", 1.0, "end")
-            # Changes the song title on the upper part of the window
-            song_title.set('There is nothing playing')
-            # Changes the artist title on the upper part of the window
-            artist_title.set('at this moment')
-            # Set program title
-            master.title(song)
-            # Set the play/pause button to play option
-            play_button_text.set('\u25B6')
-            # Set the old_song and old_artist variable to check for changes
-            old_song = song
-            old_artist = artist
-        # checks if the old_song or old_artist variable are different
-        # from the current one
-        elif old_song != song or old_artist != artist:
-            master.update()
-            # Changes the song title on the upper part of the window
-            song_title.set(song)
-            # Changes the artist title on the upper part of the window
-            artist_title.set(artist)
-            # Set program title
-            master.title('{0} - {1}'.format(song, artist))
-            # Set the play/pause button to play option
-            play_button_text.set('\u23F8')
-            # Placeholder while system searchs for lyric
-            lyric_space.setvalue('Searching...')
-            lyric_space.tag_add("config", 1.0, "end")
-            # updates the window
-            master.update()
-            # then try to get the lyric with that info
-            lyrics = PyLyrics.getLyrics(artist, song)
+    # Checks if there is nothing playing
+    if (artist == 'There is nothing playing at this moment') or (
+            song == 'There is nothing playing at this moment'):
+        # Then set the lyric to tell the user about it
+        lyric_space.setvalue('There is nothing playing at this moment')
+        # centralizes the Lyric Text using a tag
+        lyric_space.tag_add("config", 1.0, "end")
+        # Changes the song title on the upper part of the window
+        song_title.set('There is nothing playing')
+        # Changes the artist title on the upper part of the window
+        artist_title.set('at this moment')
+        # Set program title
+        master.title(song)
+        # Set the play/pause button to play option
+        play_button_text.set('\u25B6')
+        # Set the old_song and old_artist variable to check for changes
+        old_song = song
+        old_artist = artist
+    # checks if the old_song or old_artist variable are different
+    # from the current one
+    elif old_song != song or old_artist != artist:
+        master.update()
+        # Changes the song title on the upper part of the window
+        song_title.set(song)
+        # Changes the artist title on the upper part of the window
+        artist_title.set(artist)
+        # Set program title
+        master.title('{0} - {1}'.format(song, artist))
+        # Set the play/pause button to play option
+        play_button_text.set('\u23F8')
+        # Placeholder while system searchs for lyric
+        lyric_space.setvalue('Searching...')
+        lyric_space.tag_add("config", 1.0, "end")
+        # updates the window
+        master.update()
+        # then try to get the lyric with that info
+        # lyrics = PyLyrics.getLyrics(artist, song)
+        lyrics = lyric.get(artist, song)
+        if lyrics != 'Lyric not found':
             # Changes the lyric text to the current lyric
             lyric_space.setvalue(lyrics)
             # centralizes the Lyric Text using a tag
             lyric_space.tag_add("config", 1.0, "end")
             # Set the old_song and old_artist variable to check for changes
-            old_song = song
-            old_artist = artist
-        # if it's the same song from the last time it ran
         else:
-            # just resets the value of old_song and old_artist
-            old_song = song
-            old_artist = artist
+            # warns the user on the lyric text about the failure
+            lyric_space.setvalue('Lyric not found!')
+            # centralizes the Lyric Text using a tag
+            lyric_space.tag_add("config", 1.0, "end")
+            # Set the old_song and old_artist variable to check for changes
+        old_song = song
+        old_artist = artist
+        # if it's the same song from the last time it ran
+    else:
+        # just resets the value of old_song and old_artist
+        old_song = song
+        old_artist = artist
     # if the PyLyrics module fails to get the lyric
+    '''
     except ValueError:
         master.update()
         # Changes the song title on the upper part of the window
@@ -90,6 +98,7 @@ def get_lyrics(old_song=None, old_artist=None):
         old_artist = artist
         # Skip the error
         pass
+    '''
     # Repeats this function every 1 second(1000ms)
     master.after(1000, get_lyrics, old_song, old_artist)
 
@@ -99,7 +108,6 @@ master = Tk()
 master.configure(background='#282828')
 # Icon support
 if os.path.isfile(os.getcwd() + '/lyrics.png'):
-    print('file found')
     img = Image("photo", file=os.getcwd() + "/lyrics.png")
     master.tk.call('wm', 'iconphoto', master._w, img)
 # -------------- SET POSITION OF THE WINDOW --------------
