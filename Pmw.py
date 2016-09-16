@@ -51,6 +51,7 @@ import types
 import tkinter
 import collections
 from tkinter import ttk
+import platform
 
 # tkinter 8.5 -> 8.6 fixed a problem in which selected indexes
 # were reported as strings instead of ints
@@ -1892,7 +1893,7 @@ class _ErrorWindow:
         # Create the text widget and scrollbar in a frame
         upperframe = tkinter.Frame(self._top)
 
-        scrollbar = ttk.Scrollbar(upperframe, orient='vertical')
+        scrollbar = tkinter.Scrollbar(upperframe, orient='vertical')
         scrollbar.pack(side = 'right', fill = 'y')
 
         self._text = tkinter.Text(upperframe, yscrollcommand=scrollbar.set)
@@ -2025,10 +2026,6 @@ class ScrolledText(Pmw.MegaWidget):
         Pmw.MegaWidget.__init__(self, parent)
 
         # Create the components.
-        style = ttk.Style()
-        style.configure("Spotilyrics.Vertical.TScrollbar", foreground="white", background="black")
-
-        
         interior = self.interior()
 
         if self['usehullsize']:
@@ -2040,12 +2037,21 @@ class ScrolledText(Pmw.MegaWidget):
             # the frame.  This avoids a problem in Tk, where window
             # items in a text widget may overlap the border of the
             # text widget.
-            self._borderframe = self.createcomponent('borderframe',
+            if platform.system() == 'Linux':
+                self._borderframe = self.createcomponent('borderframe',
+                        (), None,
+                        tkinter.Frame, (interior,),
+                        relief = 'flat',
+                        borderwidth = 0,
+                        background='#181818')
+            elif platform.system() == 'Windows':
+                self._borderframe = self.createcomponent('borderframe',
                     (), None,
                     tkinter.Frame, (interior,),
                     relief = 'sunken',
-                    borderwidth = 2,
-            )
+                    borderwidth = 1,
+                    background='black')
+
             self._borderframe.grid(row = 4, column = 4, sticky = 'news')
 
             # Create the text widget.
@@ -2113,19 +2119,30 @@ class ScrolledText(Pmw.MegaWidget):
         # Create the horizontal scrollbar
         self._horizScrollbar = self.createcomponent('horizscrollbar',
                 (), 'Scrollbar',
-                ttk.Scrollbar, (interior,),
+                tkinter.Scrollbar, (interior,),
                 orient='horizontal',
                 command=self._textbox.xview
         )
 
         # Create the vertical scrollbar
-        self._vertScrollbar = self.createcomponent('vertscrollbar',
+        if platform.system() == 'Linux':
+            self._vertScrollbar = self.createcomponent('vertscrollbar',
+                    (), 'Scrollbar',
+                    tkinter.Scrollbar, (interior,),
+                    orient='vertical',
+                    bd=0,
+                    troughcolor='#282828',
+                    bg='grey',
+                    command=self._textbox.yview
+            )
+        elif platform.system() == 'Windows':
+            self._vertScrollbar = self.createcomponent('vertscrollbar',
                 (), 'Scrollbar',
                 ttk.Scrollbar, (interior,),
                 orient='vertical',
                 command=self._textbox.yview
-        )
-
+            )
+             
         self.createlabel(interior, childCols = 5, childRows = 5)
 
         # Initialise instance variables.

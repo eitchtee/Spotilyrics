@@ -17,21 +17,23 @@ Media_Mute = 0xAD
 def song_info_linux():
     session_bus = dbus.SessionBus()
     spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
-                                     "/org/mpris/MediaPlayer2")
+                                         "/org/mpris/MediaPlayer2")
     spotify_properties = dbus.Interface(spotify_bus,
-                                    "org.freedesktop.DBus.Properties")
-    metadata = spotify_properties.Get("org.mpris.MediaPlayer2.Player", "Metadata")
-    song_info = metadata['sexam:title']
+                                        "org.freedesktop.DBus.Properties")
+    metadata = spotify_properties.Get(
+        "org.mpris.MediaPlayer2.Player", "Metadata")
+    song_info = metadata['xesam:title']
     return song_info
 
 
 def artist_info_linux():
     session_bus = dbus.SessionBus()
     spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
-                                     "/org/mpris/MediaPlayer2")
+                                         "/org/mpris/MediaPlayer2")
     spotify_properties = dbus.Interface(spotify_bus,
-                                    "org.freedesktop.DBus.Properties")
-    metadata = spotify_properties.Get("org.mpris.MediaPlayer2.Player", "Metadata")
+                                        "org.freedesktop.DBus.Properties")
+    metadata = spotify_properties.Get(
+        "org.mpris.MediaPlayer2.Player", "Metadata")
     artist_info = metadata['xesam:artist'][0]
     return artist_info
 
@@ -61,12 +63,12 @@ def artist():
     elif platform.system() == 'Linux':
         try:
             return artist_info_linux()
-        except DBusException:
+        except:
             return "There is nothing playing at this moment"
 
 
 def song():
-    if platform.system() == 'Windows': 
+    if platform.system() == 'Windows':
         try:
             temp = song_info()
             artist, song = temp.split("-", 1)
@@ -76,8 +78,8 @@ def song():
             return "There is nothing playing at this moment"
     elif platform.system() == 'Linux':
         try:
-            return artist_info_linux()
-        except DBusException:
+            return song_info_linux()
+        except:
             return "There is nothing playing at this moment"
 
 ###SpotifyBlock###
@@ -122,19 +124,51 @@ def hwcode(Media):
 
 
 def next():
-    win32api.keybd_event(Media_Next, hwcode(Media_Next))
+    if platform.system() == 'Linux':
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(
+            'org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2')
+        interface = dbus.Interface(
+            proxy, dbus_interface='org.mpris.MediaPlayer2.Player')
+        interface.Next()
+    elif platform.system() == 'Windows':
+        win32api.keybd_event(Media_Next, hwcode(Media_Next))
 
 
 def previous():
-    win32api.keybd_event(Media_Previous, hwcode(Media_Previous))
+    if platform.system() == 'Linux':
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(
+            'org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2')
+        interface = dbus.Interface(
+            proxy, dbus_interface='org.mpris.MediaPlayer2.Player')
+        interface.Previous()
+    elif platform.system() == 'Windows':
+        win32api.keybd_event(Media_Previous, hwcode(Media_Previous))
 
 
 def pause():
-    win32api.keybd_event(Media_Pause, hwcode(Media_Pause))
+    if platform.system() == 'Linux':
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(
+            'org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2')
+        interface = dbus.Interface(
+            proxy, dbus_interface='org.mpris.MediaPlayer2.Player')
+        interface.PlayPause()
+    elif platform.system() == 'Windows':
+        win32api.keybd_event(Media_Pause, hwcode(Media_Pause))
 
 
 def play():
-    win32api.keybd_event(Media_Pause, hwcode(Media_Pause))
+    if platform.system() == 'Linux':
+        bus = dbus.SessionBus()
+        proxy = bus.get_object(
+            'org.mpris.MediaPlayer2.spotify', '/org/mpris/MediaPlayer2')
+        interface = dbus.Interface(
+            proxy, dbus_interface='org.mpris.MediaPlayer2.Player')
+        interface.PlayPause()
+    elif platform.system() == 'Windows':
+        win32api.keybd_event(Media_Pause, hwcode(Media_Pause))
 
 
 def mute():
