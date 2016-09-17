@@ -9,8 +9,12 @@ from PyLyrics import *
 
 def get(artist, song):
     def lyricsdotcom(artist, song):
-        n_artist = artist.replace("'", '').replace('-', '')
-        n_song = song.replace("'", '').replace('-', '')
+        artist = artist.replace("'", '').replace('-', '')
+        song = song.replace("'", '').replace('-', '')
+        # Replace spaces with dashes to imporve URL logging.
+        regex_spaces = re.compile(r'[\s]+', re.UNICODE)
+        artist = regex_spaces.sub('-', artist)
+        song = regex_spaces.sub('-', song)
         # This regex mathches anything other than Alphanumeric, spaces and
         # dashes
         # and removes them.
@@ -18,10 +22,10 @@ def get(artist, song):
         # for
         # Python3.
         regex_non_alphanum = re.compile(r'[^\w\s\-]*', re.UNICODE)
-        n_artist = regex_non_alphanum.sub('', n_artist)
-        n_song = regex_non_alphanum.sub('', n_song)
+        artist = regex_non_alphanum.sub('', artist)
+        song = regex_non_alphanum.sub('', song)
         url = 'http://www.lyrics.com/%s-lyrics-%s.html' % (quote(
-            n_song), quote(n_artist))
+            song), quote(artist))
         print('Trying ', url, '\n')
         try:
             res = requests.get(url)
@@ -42,8 +46,12 @@ def get(artist, song):
             return None
 
     def metrolyrics(artist, song):
-        n_artist = artist.replace("'", '').replace('&', 'and').replace('-', '')
-        n_song = song.replace("'", '').replace('-', '')
+        artist = artist.replace("'", '').replace('&', 'and').replace('-', '')
+        song = song.replace("'", '').replace('-', '')
+        # Replace spaces with dashes to imporve URL logging.
+        regex_spaces = re.compile(r'[\s]+', re.UNICODE)
+        artist = regex_spaces.sub('-', artist)
+        song = regex_spaces.sub('-', song)
         # This regex mathches anything other than Alphanumeric, spaces and
         # dashes
         # and removes them.
@@ -51,10 +59,10 @@ def get(artist, song):
         # for
         # Python3.
         regex_non_alphanum = re.compile(r'[^\w\s\-]*', re.UNICODE)
-        n_artist = regex_non_alphanum.sub('', n_artist)
-        n_song = regex_non_alphanum.sub('', n_song)
+        artist = regex_non_alphanum.sub('', artist)
+        song = regex_non_alphanum.sub('', song)
         url = 'http://www.metrolyrics.com/%s-lyrics-%s.html' % (quote(
-            n_song), quote(n_artist))
+            song), quote(artist))
         print('Trying ', url)
         try:
             res = requests.get(url)
@@ -74,9 +82,13 @@ def get(artist, song):
             return None
 
     def letrasmusbr(artist, song):
+        # Replace spaces with dashes to imporve URL logging.
+        regex_spaces = re.compile(r'[\s]+', re.UNICODE)
+        artist = regex_spaces.sub('-', artist)
+        song = regex_spaces.sub('-', song)
         # Replace upper(apostrophe) commas with dashes '-'
-        n_artist = artist.replace("'", '')
-        n_song = song.replace("'", '')
+        artist = artist.replace("'", '')
+        song = song.replace("'", '')
         # This regex mathches anything other than Alphanumeric, spaces and
         # dashes
         # and removes them.
@@ -84,10 +96,10 @@ def get(artist, song):
         # for
         # Python3.
         regex_non_alphanum = re.compile(r'[^\w\s\-]*', re.UNICODE)
-        n_artist = regex_non_alphanum.sub('', n_artist)
-        n_song = regex_non_alphanum.sub('', n_song)
+        artist = regex_non_alphanum.sub('', artist)
+        song = regex_non_alphanum.sub('', song)
         url = 'https://www.letras.mus.br/%s/%s' % (
-            quote(n_artist), quote(n_song))
+            quote(artist), quote(song))
         print('Trying ', url)
         try:
             res = requests.get(url)
@@ -109,9 +121,13 @@ def get(artist, song):
             return None
 
     def vagalume(artist, song):
+        # Replace spaces with dashes to imporve URL logging.
+        regex_spaces = re.compile(r'[\s]+', re.UNICODE)
+        artist = regex_spaces.sub('-', artist)
+        song = regex_spaces.sub('-', song)
         # Replace upper(apostrophe) commas with nothing
-        n_artist = artist.replace("'", '')
-        n_song = song.replace("'", '')
+        artist = artist.replace("'", '')
+        song = song.replace("'", '')
         # This regex mathches anything other than Alphanumeric, spaces and
         # dashes
         # and removes them.
@@ -119,10 +135,10 @@ def get(artist, song):
         # for
         # Python3.
         regex_non_alphanum = re.compile(r'[^\w\s\-]*', re.UNICODE)
-        n_artist = regex_non_alphanum.sub('', n_artist)
-        n_song = regex_non_alphanum.sub('', n_song)
+        artist = regex_non_alphanum.sub('', artist)
+        song = regex_non_alphanum.sub('', song)
         url = 'https://www.vagalume.com.br/%s/%s.html' % (
-            quote(n_artist), quote(n_song))
+            quote(artist), quote(song))
         print('Trying ', url)
         try:
             res = requests.get(url)
@@ -174,10 +190,6 @@ def get(artist, song):
         print('Found! \n')
         return lyrics
     else:
-        # Replace spaces with dashes to imporve URL logging.
-        regex_spaces = re.compile(r'[\s]+', re.UNICODE)
-        artist = regex_spaces.sub('-', artist)
-        song = regex_spaces.sub('-', song)
         song = normalize('NFKD', song).encode('ASCII', 'ignore').decode(
             'ASCII')
         artist = normalize('NFKD', artist).encode(
