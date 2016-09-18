@@ -53,8 +53,44 @@ def config():
     Button(config_window, text='Save', command=save).grid(column=1)
 
 
+def check_save_button():
+    artist = spotilib.artist()
+    song = spotilib.song().split(' - ', 1)[0]
+    if os.path.isfile('{0}/lyrics/{1} - {2}.txt'.format(
+            os.getcwd(), song, artist)):
+        save_button.configure(fg='yellow', state='normal')
+        master.focus()
+
+    else:
+        save_button.configure(fg='#1DB954', state='normal')
+        master.focus()
+
+
+def save():
+    global lyrics
+    directory = '{0}/lyrics/'.format(os.getcwd())
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    artist = spotilib.artist()
+    song = spotilib.song().split(' - ', 1)[0]
+    file = '{0}/lyrics/{1} - {2}.txt'.format(os.getcwd(), song, artist)
+    if not os.path.isfile(file):
+        # lyrics = lyric.get(artist, song)
+        with open(file, 'w') as lyricfile:
+            lyricfile.write(lyrics)
+            lyricfile.close()
+        print('File "{0}" saved \n'.format(file))
+        check_save_button()
+
+    else:
+        os.remove(file)
+        print('File "{0}" removed \n'.format(file))
+        check_save_button()
+
+
 # Main function to get the lyrics
 def get_lyrics(old_song=None, old_artist=None):
+    global lyrics
     # Gets artist name from spotilib and stores it in the artist var
     artist = spotilib.artist()
     # Gets song name from spotilib and stores it in the song var
@@ -62,6 +98,7 @@ def get_lyrics(old_song=None, old_artist=None):
     # Checks if there is nothing playing
     if (artist == 'There is nothing playing at this moment') or (
             song == 'There is nothing playing at this moment'):
+        save_button.configure(state='disabled')
         # Then set the lyric to tell the user about it
         lyric_space.setvalue('There is nothing playing at this moment')
         # Creates the tag to centralize the lyrics
@@ -85,6 +122,7 @@ def get_lyrics(old_song=None, old_artist=None):
     # checks if the old_song or old_artist variable are different
     # from the current one
     elif old_song != song or old_artist != artist:
+        check_save_button()
         master.update()
         # Changes the song title on the upper part of the window
         song_title.set(song)
@@ -139,6 +177,7 @@ def get_lyrics(old_song=None, old_artist=None):
 
 
 # creates the main window
+lyrics = None
 master = Tk()
 master.title('Spotilyrics')
 master.configure(background='#282828')
@@ -236,12 +275,26 @@ if platform.system() == 'Windows':
                            font='arial 11',
                            command=config)
 
+save_button = Button(controls, text='Save',
+                     relief='flat',
+                     activebackground='#1DB954',
+                     activeforeground='#282828',
+                     bg='#282828',
+                     fg='#1DB954',
+                     bd=0,
+                     highlightthickness=0,
+                     borderwidth=0,
+                     font='arial 11 bold',
+                     takefocus='False',
+                     command=save)
+
 # Places the music controls
-previous_button.grid(sticky='n', row=0, column=0)
-play_button.grid(sticky='n', row=0, column=1)
-next_button.grid(sticky='n', row=0, column=2)
+save_button.grid(sticky='n', row=0, column=0)
+previous_button.grid(sticky='n', row=0, column=1)
+play_button.grid(sticky='n', row=0, column=2)
+next_button.grid(sticky='n', row=0, column=3)
 if platform.system() == 'Windows':
-    config_button.grid(sticky='n', row=0, column=3)
+    config_button.grid(sticky='n', row=0, column=4)
 
 # Creates the Text widget for the lyrics
 lyric_space = Pmw.ScrolledText(master, borderframe=1, scrollmargin=0)

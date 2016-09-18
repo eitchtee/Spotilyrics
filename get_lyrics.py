@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 from unicodedata import normalize
 from PyLyrics import *
+import os
 # from requests import ConnectionError, HTTPError, Timeout
 
 
@@ -26,7 +27,7 @@ def get(artist, song):
         song = regex_non_alphanum.sub('', song)
         url = 'http://www.lyrics.com/%s-lyrics-%s.html' % (quote(
             song), quote(artist))
-        print('Trying ', url, '\n')
+        print('Trying:', url, '\n')
         try:
             res = requests.get(url)
             soup = BeautifulSoup(res.content, 'html.parser')
@@ -63,7 +64,7 @@ def get(artist, song):
         song = regex_non_alphanum.sub('', song)
         url = 'http://www.metrolyrics.com/%s-lyrics-%s.html' % (quote(
             song), quote(artist))
-        print('Trying ', url)
+        print('Trying:', url)
         try:
             res = requests.get(url)
             soup = BeautifulSoup(res.content, 'html.parser')
@@ -100,7 +101,7 @@ def get(artist, song):
         song = regex_non_alphanum.sub('', song)
         url = 'https://www.letras.mus.br/%s/%s' % (
             quote(artist), quote(song))
-        print('Trying ', url)
+        print('Trying:', url)
         try:
             res = requests.get(url)
             soup = BeautifulSoup(res.text, 'html.parser')
@@ -139,7 +140,7 @@ def get(artist, song):
         song = regex_non_alphanum.sub('', song)
         url = 'https://www.vagalume.com.br/%s/%s.html' % (
             quote(artist), quote(song))
-        print('Trying ', url)
+        print('Trying:', url)
         try:
             res = requests.get(url)
             soup = BeautifulSoup(res.text, 'html.parser')
@@ -175,7 +176,7 @@ def get(artist, song):
                         return None
 
     def lyricswikia(artist, song):
-        print('Trying PyLyrics with "', song, '-', artist + '"')
+        print('Trying: PyLyrics with "{0} - {1}"'.format(song, artist))
         try:
             lyrics = PyLyrics.getLyrics(artist, song)
         except ValueError:
@@ -183,24 +184,40 @@ def get(artist, song):
         else:
             return lyrics
 
+    # Prints song name and artist for console logging
     print(song, '-', artist)
+    # Removes exerything after a " - " on a song title
     song = song.split(' - ', 1)[0]
-    lyrics = lyricswikia(artist, song)
-    if lyrics is not None:
-        print('Found! \n')
-        return lyrics
-    else:
-        song = normalize('NFKD', song).encode('ASCII', 'ignore').decode(
-            'ASCII')
-        artist = normalize('NFKD', artist).encode(
-            'ASCII', 'ignore').decode('ASCII')
-        song = song.lower()
-        artist = artist.lower()
 
-        lyrics = handler(artist, song)
+    # checks if there is a file with the song name and artist on
+    # the lyrics folder
+    print('Checking for saved lyrics')
+    if os.path.isfile('{0}/lyrics/{1} - {2}.txt'.format(
+            os.getcwd(), song, artist)):
+        print('Found! \n')
+        with open('{0}/lyrics/{1} - {2}.txt'.format(
+                os.getcwd(), song, artist), 'r') as lyricfile:
+            lyrics = lyricfile.read()
+            lyricfile.close()
+        return lyrics
+
+    else:
+        lyrics = lyricswikia(artist, song)
         if lyrics is not None:
             print('Found! \n')
             return lyrics
         else:
-            print('Not found! \n')
-            return 'Lyric not found'
+            song = normalize('NFKD', song).encode('ASCII', 'ignore').decode(
+                'ASCII')
+            artist = normalize('NFKD', artist).encode(
+                'ASCII', 'ignore').decode('ASCII')
+            song = song.lower()
+            artist = artist.lower()
+
+            lyrics = handler(artist, song)
+            if lyrics is not None:
+                print('Found! \n')
+                return lyrics
+            else:
+                print('Not found! \n')
+                return 'Lyric not found'
