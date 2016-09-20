@@ -6,6 +6,24 @@ import os
 import get_lyrics as lyric
 import platform
 import configparser
+from functools import partial
+
+
+# returns the correct fontstyle
+def fontstyle():
+    config = configparser.ConfigParser()
+    configini = os.getcwd() + '/config.ini'
+    config.read(configini)
+    bold = config.get('LYRIC', 'bold')
+    italics = config.get('LYRIC', 'italics')
+    if bold == '1' and italics == '1':
+        return ('bold italic')
+    elif bold == '1' and italics == '0':
+        return ('bold')
+    elif bold == '0' and italics == '1':
+        return ('italic')
+    elif bold == '0' and italics == '0':
+        return ('normal')
 
 
 # Returns the fontsize
@@ -18,39 +36,96 @@ def fontsize():
 
 
 def config():
+    def reset_to_default():
+        font_size_var.set(10)
+        bold_check.deselect()
+        italics_check.deselect()
+        save(False)
+
+    def set_on_start():
+        # sets fontsize to current config file one
+        font_size_var.set(fontsize())
+        # sets fontstyle to current config file one
+        config = configparser.ConfigParser()
+        configini = os.getcwd() + '/config.ini'
+        config.read(configini)
+        bold = config.get('LYRIC', 'bold')
+        italics = config.get('LYRIC', 'italics')
+        if bold == '1':
+            bold_check.select()
+        else:
+            bold_check.deselect()
+        if italics == '1':
+            italics_check.select()
+        else:
+            italics_check.deselect()
+
     # Update the lyric_space widget with the new changes
     def update():
         # Creates the tag to centralize the lyrics
         lyric_space.tag_configure('config', justify='center',
                                   foreground='white',
-                                  font='arial {}'.format(fontsize()))
+                                  font=('arial', fontsize(), fontstyle()))
         # centralizes the Lyric Text using a tag
         lyric_space.tag_add("config", 1.0, "end")
 
     # saves the new configs on config.ini
-    def save():
+    def save(save_button=True):
         config = configparser.SafeConfigParser()
+        config.read('config.ini')
+        # font size save function
         if font_size.get().isdigit():
             font_size_num = font_size.get()
         else:
             font_size_num = '10'
-        config.read('config.ini')
-        config.set('LYRIC', 'FontSize', font_size_num)
+        # bold and italics save function
+        bold_info = bold_var.get()
+        italics_info = italics_var.get()
 
+        # set configs
+        config.set('LYRIC', 'FontSize', font_size_num)
+        config.set('LYRIC', 'bold', bold_info)
+        config.set('LYRIC', 'italics', italics_info)
+
+        # write configs
         with open('config.ini', 'w+') as configfile:
             config.write(configfile)
             configfile.close()
-        config_window.destroy()
-        update()
+        if save_button is True:
+            config_window.destroy()
+            update()
+        else:
+            update()
+
     # Creates the config window
     config_window = Toplevel(master)
-    Label(config_window, text='Font Size:').grid(sticky='e', row=0, column=0)
+
+    # Font size configs
+    Label(config_window, text='Font Size:').grid(sticky='w', row=0, column=0)
     font_size_var = StringVar()
-    font_size_var.set(fontsize())
     font_size = Spinbox(
-        config_window, from_=1, to=50, textvariable=font_size_var)
+        config_window, from_=1, to=50, textvariable=font_size_var, width=3)
     font_size.grid(row=0, column=1)
-    Button(config_window, text='Save', command=save).grid(column=1)
+
+    # Font Style configs
+    Label(config_window, text='Font Style:').grid(sticky='w', row=1, column=0)
+    bold_var = StringVar()
+    bold_check = Checkbutton(config_window, text="Bold",
+                             font=('arial', '10', 'bold'),
+                             variable=bold_var)
+    bold_check.grid(row=1, column=1)
+
+    italics_var = StringVar()
+    italics_check = Checkbutton(config_window, text="Italics", font=(
+        'arial', '10', 'italic'), variable=italics_var, state='normal')
+    italics_check.grid(row=1, column=2)
+
+    # sets the configs as it is on the config file
+    set_on_start()
+    # save configs button
+    Button(config_window, text='Reset to default',
+           command=reset_to_default).grid(row=3, column=1)
+    Button(config_window, text='Save', command=save).grid(row=3, column=2)
 
 
 def check_save_button():
@@ -58,11 +133,11 @@ def check_save_button():
     song = spotilib.song().split(' - ', 1)[0]
     if os.path.isfile('{0}/lyrics/{1} - {2}.txt'.format(
             os.getcwd(), song, artist)):
-        save_button.configure(fg='yellow', state='normal')
+        save_button.configure(image=saved_icon, state='normal')
         master.focus()
 
     else:
-        save_button.configure(fg='#1DB954', state='normal')
+        save_button.configure(image=save_icon, state='normal')
         master.focus()
 
 
@@ -89,7 +164,7 @@ def save():
 
 
 # Main function to get the lyrics
-def get_lyrics(old_song=None, old_artist=None):
+def get_lyrics(refresh=False, old_song=None, old_artist=None):
     global lyrics
     # Gets artist name from spotilib and stores it in the artist var
     artist = spotilib.artist()
@@ -98,13 +173,13 @@ def get_lyrics(old_song=None, old_artist=None):
     # Checks if there is nothing playing
     if (artist == 'There is nothing playing at this moment') or (
             song == 'There is nothing playing at this moment'):
-        save_button.configure(state='disabled')
+        save_button.configure(image=no_save_icon, state='disabled')
         # Then set the lyric to tell the user about it
         lyric_space.setvalue('There is nothing playing at this moment')
         # Creates the tag to centralize the lyrics
         lyric_space.tag_configure('config', justify='center',
                                   foreground='white',
-                                  font='arial {}'.format(fontsize()))
+                                  font=('arial', fontsize(), fontstyle()))
         # centralizes the Lyric Text using a tag
         lyric_space.tag_add("config", 1.0, "end")
         # Changes the song title on the upper part of the window
@@ -113,9 +188,7 @@ def get_lyrics(old_song=None, old_artist=None):
         artist_title.set('at this moment')
         # Set the play/pause button to play option
         if platform.system() == 'Windows':
-            play_button_text.set(u"\u25B6")
-        else:
-            play_button_text.set(u"\u25B6")
+            play_button.configure(image=play_icon)
         # Set the old_song and old_artist variable to check for changes
         old_song = song
         old_artist = artist
@@ -130,15 +203,13 @@ def get_lyrics(old_song=None, old_artist=None):
         artist_title.set(artist)
         # Set the play/pause button to pause option
         if platform.system() == 'Windows':
-            play_button_text.set(u"\u23F8")
-        else:
-            play_button_text.set(u"\u25B6")
+            play_button.configure(image=pause_icon)
         # Placeholder while system searchs for lyric
         lyric_space.setvalue('Searching...')
         # Creates the tag to centralize the lyrics
         lyric_space.tag_configure('config', justify='center',
                                   foreground='white',
-                                  font='arial {}'.format(fontsize()))
+                                  font=('arial', fontsize(), fontstyle()))
         lyric_space.tag_add("config", 1.0, "end")
         # updates the window
         master.update()
@@ -151,7 +222,7 @@ def get_lyrics(old_song=None, old_artist=None):
             # Creates the tag to centralize the lyrics
             lyric_space.tag_configure('config', justify='center',
                                       foreground='white',
-                                      font='arial {}'.format(fontsize()))
+                                      font=('arial', fontsize(), fontstyle()))
             # centralizes the Lyric Text using a tag
             lyric_space.tag_add("config", 1.0, "end")
             # Set the old_song and old_artist variable to check for changes
@@ -161,7 +232,7 @@ def get_lyrics(old_song=None, old_artist=None):
             # Creates the tag to centralize the lyrics
             lyric_space.tag_configure('config', justify='center',
                                       foreground='white',
-                                      font='arial {}'.format(fontsize()))
+                                      font=('arial', fontsize(), fontstyle()))
             # centralizes the Lyric Text using a tag
             lyric_space.tag_add("config", 1.0, "end")
             # Set the old_song and old_artist variable to check for changes
@@ -172,8 +243,9 @@ def get_lyrics(old_song=None, old_artist=None):
         # just resets the value of old_song and old_artist
         old_song = song
         old_artist = artist
-    # Repeats this function every 1 second(1000ms)
-    master.after(1000, get_lyrics, old_song, old_artist)
+    if refresh is False:
+        # Repeats this function every 1 second(1000ms)
+        master.after(1000, get_lyrics, False, old_song, old_artist)
 
 
 # creates the main window
@@ -182,8 +254,8 @@ master = Tk()
 master.title('Spotilyrics')
 master.configure(background='#282828')
 # Icon support
-if os.path.isfile(os.getcwd() + '/lyrics.png'):
-    img = Image("photo", file=os.getcwd() + "/lyrics.png")
+if os.path.isfile(os.getcwd() + '/gfx/lyrics.png'):
+    img = Image("photo", file=os.getcwd() + "/gfx/lyrics.png")
     master.tk.call('wm', 'iconphoto', master._w, img)
 # -------------- SET POSITION OF THE WINDOW --------------
 w = 430  # width for the Tk root
@@ -221,71 +293,69 @@ Message(title, textvariable=song_title, font='arial 11 bold',
 Message(title, textvariable=artist_title, font='arial 11 bold',
         background='#282828', foreground='white', width=440).grid()
 # Button for previous song
+previous_icon = PhotoImage(file="gfx/previous.png")
 previous_button = Button(controls,
-                         text=u'\u23EE',
-                         relief='flat',
-                         activebackground='#1DB954',
-                         activeforeground='#282828',
+                         image=previous_icon,
+                         relief='raised',
+                         activebackground='#282828',
                          bg='#282828',
-                         fg='#1DB954',
                          borderwidth=0,
                          bd=0,
                          highlightthickness=0,
-                         font='arial 11',
                          command=spotilib.previous
                          )
+
 # Button for pausing/playing song
+play_icon = PhotoImage(file="gfx/play.png")
+pause_icon = PhotoImage(file="gfx/pause.png")
 play_button = Button(controls,
-                     textvariable=play_button_text,
-                     relief='flat',
-                     activebackground='#1DB954',
-                     activeforeground='#282828',
+                     image=play_icon,
+                     relief='raised',
+                     activebackground='#282828',
                      bg='#282828',
-                     fg='#1DB954',
-                     font='arial 11',
                      borderwidth=0,
                      highlightthickness=0,
                      bd=0,
                      command=spotilib.pause
                      )
+
 # Button for the next song
+next_icon = PhotoImage(file="gfx/skip.png")
 next_button = Button(controls,
-                     text=u'\u23ED',
-                     relief='flat',
-                     activebackground='#1DB954',
-                     activeforeground='#282828',
+                     image=next_icon,
+                     relief='raise',
+                     activebackground='#282828',
                      bg='#282828',
-                     fg='#1DB954',
                      bd=0,
                      highlightthickness=0,
                      borderwidth=0,
-                     font='arial 11',
                      command=spotilib.next
                      )
-if platform.system() == 'Windows':
-    config_button = Button(controls, text=u'\u2699',
-                           relief='flat',
-                           activebackground='#1DB954',
-                           activeforeground='#282828',
-                           bg='#282828',
-                           fg='#1DB954',
-                           bd=0,
-                           highlightthickness=0,
-                           borderwidth=0,
-                           font='arial 11',
-                           command=config)
 
-save_button = Button(controls, text='Save',
-                     relief='flat',
-                     activebackground='#1DB954',
-                     activeforeground='#282828',
+# Button for the settings
+config_icon = PhotoImage(file="gfx/settings.png")
+config_button = Button(controls,
+                       image=config_icon,
+                       relief='raised',
+                       activebackground='#282828',
+                       bg='#282828',
+                       bd=0,
+                       highlightthickness=0,
+                       borderwidth=0,
+                       command=config)
+
+# Button for saving lyrics
+save_icon = PhotoImage(file="gfx/save.png")
+saved_icon = PhotoImage(file="gfx/saved.png")
+no_save_icon = PhotoImage(file="gfx/no_save.png")
+save_button = Button(controls,
+                     image=save_icon,
+                     relief='raised',
+                     activebackground='#282828',
                      bg='#282828',
-                     fg='#1DB954',
                      bd=0,
                      highlightthickness=0,
                      borderwidth=0,
-                     font='arial 11 bold',
-                     takefocus='False',
                      command=save)
 
 # Places the music controls
@@ -293,8 +363,7 @@ save_button.grid(sticky='n', row=0, column=0)
 previous_button.grid(sticky='n', row=0, column=1)
 play_button.grid(sticky='n', row=0, column=2)
 next_button.grid(sticky='n', row=0, column=3)
-if platform.system() == 'Windows':
-    config_button.grid(sticky='n', row=0, column=4)
+config_button.grid(sticky='n', row=0, column=4)
 
 # Creates the Text widget for the lyrics
 lyric_space = Pmw.ScrolledText(master, borderframe=1, scrollmargin=0)
@@ -305,24 +374,14 @@ lyric_space = Pmw.ScrolledText(master, borderframe=1, scrollmargin=0)
 lyric_space.configure(
     text_state='disabled', text_bg='#282828', text_wrap='word')
 
-if platform.system() == 'Linux':
-    # Adds the config button and menu(LINUX)
-    menubar = Menu(master,
-                   relief='flat',
-                   background='#282828',
-                   fg='#1DB954',
-                   activebackground='#1DB954',
-                   activeforeground='#282828',
-                   font='Arial 12')
-    menubar.add_command(label=u'\u2699', command=config)
-    master.config(menu=menubar)
-
 
 # Places all the gui items on the window
-controls.pack()
 title.pack()
+controls.pack()
 lyric_space.pack(expand=True, fill='both')
 
+# Allows for refreshing the lyrics with F5
+master.bind('<F5>', partial(get_lyrics, True))
 
 # Starts the function to get the lyrics and its loop
 get_lyrics()

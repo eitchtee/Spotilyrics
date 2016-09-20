@@ -5,7 +5,18 @@ from urllib.parse import quote
 from unicodedata import normalize
 from PyLyrics import *
 import os
-# from requests import ConnectionError, HTTPError, Timeout
+import urllib.request as ur
+
+
+def internet_on():
+    try:
+        stri = "https://www.google.com"
+        ur.urlopen(stri)
+    except Exception as e:
+        print(e)
+        return False
+    else:
+        return True
 
 
 def get(artist, song):
@@ -37,8 +48,7 @@ def get(artist, song):
                     '<p>', '').replace('<br/>', '').replace('</div>', '')
                 lyrics = lyrics.replace(
                     '<div class="SCREENONLY" id="lyrics" itemprop="description">', '')
-                sep = '---'
-                lyrics = lyrics.split(sep, 1)[0]
+                lyrics = lyrics.split('---', 1)[0]
 
                 return lyrics
             else:
@@ -202,22 +212,27 @@ def get(artist, song):
         return lyrics
 
     else:
-        lyrics = lyricswikia(artist, song)
-        if lyrics is not None:
-            print('Found! \n')
-            return lyrics
-        else:
-            song = normalize('NFKD', song).encode('ASCII', 'ignore').decode(
-                'ASCII')
-            artist = normalize('NFKD', artist).encode(
-                'ASCII', 'ignore').decode('ASCII')
-            song = song.lower()
-            artist = artist.lower()
-
-            lyrics = handler(artist, song)
+        if internet_on() is True:
+            lyrics = lyricswikia(artist, song)
             if lyrics is not None:
                 print('Found! \n')
                 return lyrics
             else:
-                print('Not found! \n')
-                return 'Lyric not found'
+                song = normalize('NFKD', song).encode(
+                    'ASCII', 'ignore').decode(
+                    'ASCII')
+                artist = normalize('NFKD', artist).encode(
+                    'ASCII', 'ignore').decode('ASCII')
+                song = song.lower()
+                artist = artist.lower()
+
+                lyrics = handler(artist, song)
+                if lyrics is not None:
+                    print('Found! \n')
+                    return lyrics
+                else:
+                    print('Not found! \n')
+                    return 'Lyric not found'
+        else:
+            print('No Internet! \n')
+            return 'Lyric not found'
