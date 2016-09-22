@@ -3,6 +3,13 @@
 With the removal of the Lyrics feature from Spotify, i've decided to hack together a tool to sort of replace that, and with that came Spotilyrics, it automatically fetch and shows you the lyrics from the songs you are listening, and even allows you to pause or skip a song.
 
 ---
+### Screenshots
+
+Windows 10 and Linux Mint 17 respectively:
+
+![on Windows 10](http://imgur.com/pFTD1Iv.png "on Windows 10") ![on Linux Mint 17](http://imgur.com/7uwpf3c.png "on Linux Mint 17")  
+
+---
 
 ### Install
 <p align="center">
