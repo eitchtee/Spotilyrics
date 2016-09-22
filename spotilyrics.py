@@ -99,6 +99,9 @@ def config():
 
     # Creates the config window
     config_window = Toplevel(master)
+    if os.path.isfile(os.getcwd() + '/gfx/config_window.png'):
+        img = Image("photo", file=os.getcwd() + "/gfx/config_window.png")
+        config_window.tk.call('wm', 'iconphoto', config_window._w, img)
 
     # Font size configs
     Label(config_window, text='Font Size:').grid(sticky='w', row=0, column=0)
@@ -254,8 +257,8 @@ master = Tk()
 master.title('Spotilyrics')
 master.configure(background='#282828')
 # Icon support
-if os.path.isfile(os.getcwd() + '/gfx/lyrics.png'):
-    img = Image("photo", file=os.getcwd() + "/gfx/lyrics.png")
+if os.path.isfile(os.getcwd() + '/gfx/spotilyrics.png'):
+    img = Image("photo", file=os.getcwd() + "/gfx/spotilyrics.png")
     master.tk.call('wm', 'iconphoto', master._w, img)
 # -------------- SET POSITION OF THE WINDOW --------------
 w = 430  # width for the Tk root
