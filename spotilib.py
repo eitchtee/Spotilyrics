@@ -14,28 +14,48 @@ Media_Mute = 0xAD
 
 
 ###SpotifyInfo###
+def linux_status():
+    try:
+        session_bus = dbus.SessionBus()
+        spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
+                                             "/org/mpris/MediaPlayer2")
+        spotify_properties = dbus.Interface(spotify_bus,
+                                            "org.freedesktop.DBus.Properties")
+        status = spotify_properties.Get("org.mpris.MediaPlayer2.Player",
+                                        "PlaybackStatus")
+        return status
+    except:
+        return "Paused"
+
+
 def song_info_linux():
-    session_bus = dbus.SessionBus()
-    spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
-                                         "/org/mpris/MediaPlayer2")
-    spotify_properties = dbus.Interface(spotify_bus,
-                                        "org.freedesktop.DBus.Properties")
-    metadata = spotify_properties.Get(
-        "org.mpris.MediaPlayer2.Player", "Metadata")
-    song_info = metadata['xesam:title']
-    return song_info
+    if linux_status() == "Playing":
+        session_bus = dbus.SessionBus()
+        spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
+                                             "/org/mpris/MediaPlayer2")
+        spotify_properties = dbus.Interface(spotify_bus,
+                                            "org.freedesktop.DBus.Properties")
+        metadata = spotify_properties.Get(
+            "org.mpris.MediaPlayer2.Player", "Metadata")
+        song_info = metadata['xesam:title']
+        return song_info
+    else:
+        return "There is nothing playing at this moment"
 
 
 def artist_info_linux():
-    session_bus = dbus.SessionBus()
-    spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
-                                         "/org/mpris/MediaPlayer2")
-    spotify_properties = dbus.Interface(spotify_bus,
-                                        "org.freedesktop.DBus.Properties")
-    metadata = spotify_properties.Get(
-        "org.mpris.MediaPlayer2.Player", "Metadata")
-    artist_info = metadata['xesam:artist'][0]
-    return artist_info
+    if linux_status() == "Playing":
+        session_bus = dbus.SessionBus()
+        spotify_bus = session_bus.get_object("org.mpris.MediaPlayer2.spotify",
+                                             "/org/mpris/MediaPlayer2")
+        spotify_properties = dbus.Interface(spotify_bus,
+                                            "org.freedesktop.DBus.Properties")
+        metadata = spotify_properties.Get(
+            "org.mpris.MediaPlayer2.Player", "Metadata")
+        artist_info = metadata['xesam:artist'][0]
+        return artist_info
+    else:
+        return "There is nothing playing at this moment"
 
 
 def getwindow(Title="SpotifyMainWindow"):

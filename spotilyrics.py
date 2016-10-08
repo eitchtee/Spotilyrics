@@ -7,6 +7,11 @@ import get_lyrics as lyric
 import platform
 import configparser
 from functools import partial
+# for album art
+import spotipy
+from urllib.request import urlopen
+import io
+from PIL import Image as img, ImageTk
 
 
 # returns the correct fontstyle
@@ -102,6 +107,7 @@ def config():
     if os.path.isfile(os.getcwd() + '/gfx/config_window.png'):
         img = Image("photo", file=os.getcwd() + "/gfx/config_window.png")
         config_window.tk.call('wm', 'iconphoto', config_window._w, img)
+    config_window.resizable(width=False, height=False)
 
     # Font size configs
     Label(config_window, text='Font Size:').grid(sticky='w', row=0, column=0)
@@ -144,6 +150,36 @@ def check_save_button():
         master.focus()
 
 
+def get_album_art():
+    art.image = None
+    title.pack_forget()
+    album_art.pack(side=LEFT)
+    title.pack(side=LEFT)
+    spotify = spotipy.Spotify()
+    artist = spotilib.artist()
+    song = spotilib.song()
+    querry = '{0} - {1}'.format(song, artist)
+    results = spotify.search(q=querry, type='track', limit=1)
+    try:
+        items = results['tracks']['items']
+        track = items[0]
+        url = track['album']['images'][2]['url']
+        print('Found album art at:', url)
+
+        u = urlopen(url)
+        image_bytes = u.read()
+        data_stream = io.BytesIO(image_bytes)
+        album_art_data = img.open(data_stream)
+        u.close()
+        album = ImageTk.PhotoImage(album_art_data)
+        art.config(image=album)
+        art.image = album
+        art.grid()
+    except:
+        title.pack(side=LEFT)
+        print('Album art not found!')
+
+
 def save():
     global lyrics
     directory = '{0}/lyrics/'.format(os.getcwd())
@@ -168,14 +204,24 @@ def save():
 
 # Main function to get the lyrics
 def get_lyrics(refresh=False, old_song=None, old_artist=None):
+    master.update()
     global lyrics
     # Gets artist name from spotilib and stores it in the artist var
     artist = spotilib.artist()
     # Gets song name from spotilib and stores it in the song var
     song = spotilib.song()
+    if platform.system() == 'Linux':
+        # receives the status on linux
+        status = spotilib.linux_status()
+    else:
+        status = None
     # Checks if there is nothing playing
     if (artist == 'There is nothing playing at this moment') or (
-            song == 'There is nothing playing at this moment'):
+            song == 'There is nothing playing at this moment') or (
+            status == 'Paused'):
+        master.update()
+        art.image = None
+        album_art.pack_forget()
         save_button.configure(image=no_save_icon, state='disabled')
         # Then set the lyric to tell the user about it
         lyric_space.setvalue('There is nothing playing at this moment')
@@ -186,27 +232,32 @@ def get_lyrics(refresh=False, old_song=None, old_artist=None):
         # centralizes the Lyric Text using a tag
         lyric_space.tag_add("config", 1.0, "end")
         # Changes the song title on the upper part of the window
-        song_title.set('There is nothing playing')
+        song_title.set('There is nothing playing at this moment')
         # Changes the artist title on the upper part of the window
-        artist_title.set('at this moment')
+        artist_title.set('')
         # Set the play/pause button to play option
-        if platform.system() == 'Windows':
-            play_button.configure(image=play_icon)
+        play_button.configure(image=play_icon)
         # Set the old_song and old_artist variable to check for changes
         old_song = song
         old_artist = artist
     # checks if the old_song or old_artist variable are different
     # from the current one
     elif old_song != song or old_artist != artist:
-        check_save_button()
+        art.image = None
+        previous_button.configure(state='disabled')
+        next_button.configure(state='disabled')
+        play_button.configure(state='disabled')
+        save_button.configure(state='disabled')
+        config_button.configure(state='disabled')
         master.update()
         # Changes the song title on the upper part of the window
         song_title.set(song)
         # Changes the artist title on the upper part of the window
         artist_title.set(artist)
         # Set the play/pause button to pause option
-        if platform.system() == 'Windows':
-            play_button.configure(image=pause_icon)
+        play_button.configure(image=pause_icon)
+        master.update()
+        get_album_art()
         # Placeholder while system searchs for lyric
         lyric_space.setvalue('Searching...')
         # Creates the tag to centralize the lyrics
@@ -217,7 +268,6 @@ def get_lyrics(refresh=False, old_song=None, old_artist=None):
         # updates the window
         master.update()
         # then try to get the lyric with that info
-        # lyrics = PyLyrics.getLyrics(artist, song)
         lyrics = lyric.get(artist, song)
         if lyrics != 'Lyric not found':
             # Changes the lyric text to the current lyric
@@ -238,10 +288,15 @@ def get_lyrics(refresh=False, old_song=None, old_artist=None):
                                       font=('arial', fontsize(), fontstyle()))
             # centralizes the Lyric Text using a tag
             lyric_space.tag_add("config", 1.0, "end")
-            # Set the old_song and old_artist variable to check for changes
+        check_save_button()
+        # Set the old_song and old_artist variable to check for changes
         old_song = song
         old_artist = artist
         # if it's the same song from the last time it ran
+        previous_button.configure(state='normal')
+        next_button.configure(state='normal')
+        play_button.configure(state='normal')
+        config_button.configure(state='normal')
     else:
         # just resets the value of old_song and old_artist
         old_song = song
@@ -258,8 +313,8 @@ master.title('Spotilyrics')
 master.configure(background='#282828')
 # Icon support
 if os.path.isfile(os.getcwd() + '/gfx/spotilyrics.png'):
-    img = Image("photo", file=os.getcwd() + "/gfx/spotilyrics.png")
-    master.tk.call('wm', 'iconphoto', master._w, img)
+    icon = Image("photo", file=os.getcwd() + "/gfx/spotilyrics.png")
+    master.tk.call('wm', 'iconphoto', master._w, icon)
 # -------------- SET POSITION OF THE WINDOW --------------
 w = 430  # width for the Tk root
 h = 577  # height for the Tk root
@@ -282,19 +337,31 @@ master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 song_title = StringVar()
 artist_title = StringVar()
 play_button_text = StringVar()
-# Frame for the tiles
-title = Frame(master)
+# Frame for holding the album art and the titles
+title_holder = Frame(master)
+title_holder.configure(background='#282828')
+# Frame for the album art
+album_art = Frame(title_holder)
+# Frame for the titles
+title = Frame(title_holder)
 title.configure(background='#282828')
 # frame for the controls
 controls = Frame(master)
 controls.configure(background='#282828')
 
+# Placeholder for album art
+art = Label(album_art)
+art.config(background='#282828')
+art.grid()
+
 # Creates the Song Title text
 Message(title, textvariable=song_title, font='arial 11 bold',
-        background='#282828', foreground='white', width=440).grid()
+        background='#282828', foreground='white', width=200,
+        justify='center').grid(sticky='w')
 # Creates the Artist Title text
 Message(title, textvariable=artist_title, font='arial 11 bold',
-        background='#282828', foreground='white', width=440).grid()
+        background='#282828', foreground='white', width=200,
+        justify='center').grid(sticky='w')
 # Button for previous song
 previous_icon = PhotoImage(file="gfx/previous.png")
 previous_button = Button(controls,
@@ -379,8 +446,10 @@ lyric_space.configure(
 
 
 # Places all the gui items on the window
-title.pack()
-controls.pack()
+title_holder.pack(pady=8)
+album_art.pack(side=LEFT)
+title.pack(side=LEFT)
+controls.pack(pady=3)
 lyric_space.pack(expand=True, fill='both')
 
 # Allows for refreshing the lyrics with F5
