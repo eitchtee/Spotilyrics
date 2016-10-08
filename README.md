@@ -7,7 +7,7 @@ With the removal of the Lyrics feature from Spotify, i've decided to hack togeth
 
 Windows 10 and Linux Mint 17 respectively:
 
-![on Windows 10](http://imgur.com/pFTD1Iv.png "on Windows 10") ![on Linux Mint 17](http://imgur.com/7uwpf3c.png "on Linux Mint 17")  
+![on Windows 10](http://imgur.com/90WRfBb.png "on Windows 10") ![on Linux Mint 17](http://imgur.com/KKWG9OI.png "on Linux Mint 17")  
 
 ---
 
@@ -21,15 +21,23 @@ Windows 10 and Linux Mint 17 respectively:
 
 1. You will need Python 3.5
 
-2. You will need [PyLyrics](https://pypi.python.org/pypi/PyLyrics/1.1.0)
+2. Install [PyLyrics](https://pypi.python.org/pypi/PyLyrics/1.1.0)
 
   `pip install PyLyrics`
+  
+3. Intall [Spotipy](https://pypi.python.org/pypi/spotipy)
 
-3. Run your main Spotify program
+  `pip install Spotipy`
+  
+4. Install [PIL](https://pypi.python.org/pypi/image/1.5.5)
 
-4. Run the `spotilyrics.py` script
+  `pip install Image`
 
-5. Enjoy your lyrics!
+5. Run Spotify
+
+6. Run the `spotilyrics.py` script
+
+7. Enjoy your lyrics!
 
 ---
 
@@ -42,9 +50,7 @@ Download Microsoft Visual C++ 2010 Redistributable [32bit(x86)](https://www.micr
 Check if your have the Windows Update [KB2999226](https://support.microsoft.com/en-gb/kb/2999226) installed on your system, if you don't, install it.  
 In case the error persists, install Visual C++ Redistributable for Visual Studio 2015. [32bit](http://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x86.exe) or [64bit](http://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe)
 
-
 ---
-### Thanks and Credits
-* Thanks to [XanderMJ](https://github.com/XanderMJ/) for creating the great [spotilib](https://github.com/XanderMJ/spotilib) which without it this project wouldn't be possible
-* Thanks to [Ernesto Savoretti](https://sourceforge.net/u/sandy2008/) for fixig the [pmwbundle.py](https://sourceforge.net/p/pmw/discussion/131281/thread/24235048/) code and posting it on some obscure sourceforge thread
+
+### Credits
 * Icons made by Freepik from www.flaticon.com
