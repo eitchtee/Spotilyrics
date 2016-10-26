@@ -2,6 +2,8 @@
 
 With the removal of the Lyrics feature from Spotify, i've decided to hack together a tool to sort of replace that, and with that came Spotilyrics, it automatically fetch and shows you the lyrics from the songs you are listening, and even allows you to pause or skip a song.
 
+**THIS IS WINDOWS AND LINUX ONLY**
+
 ---
 ### Screenshots
 
@@ -14,30 +16,28 @@ Windows 10 and Linux Mint 17 respectively:
 ### Install
 <p align="center">
   <a href="https://github.com/eitchtee/Spotilyrics/releases/latest"><img src="http://imgur.com/NmGvnqx.png"></a><br>
-  For Linux and Windows
+  For Windows
 </p>
 
-### Manual Install(**Windows and Linux only**)
+As of v1.1.0-beta I've stopped doing Linux executables due to a unknown bug between PIL and Pyinstaller, guiven the circunstance, use the guide below to use this script on Linux.
 
-1. You will need Python 3.5
+### Manual Install
 
-2. Install [PyLyrics](https://pypi.python.org/pypi/PyLyrics/1.1.0)
-
-  `pip install PyLyrics`
+1. You will need Python 3.x
   
-3. Intall [Spotipy](https://pypi.python.org/pypi/spotipy)
+2. Intall [Spotipy](https://pypi.python.org/pypi/spotipy)
 
   `pip install Spotipy`
   
-4. Install [PIL](https://pypi.python.org/pypi/image/1.5.5)
+3. Install [PIL](https://pypi.python.org/pypi/image/1.5.5)
 
   `pip install Image`
 
-5. Run Spotify
+4. Run Spotify
 
-6. Run the `spotilyrics.py` script
+5. Run the `spotilyrics.py` script
 
-7. Enjoy your lyrics!
+6. Enjoy your lyrics!
 
 ---
 
