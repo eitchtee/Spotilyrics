@@ -1,3 +1,7 @@
+**SPOTILYRICS IS CURRENTLY BROKEN ON WINDOWS DUE TO SOME CHANGES ON SPOTIFY'S SIDE. IT MIGHT WORK ON LINUX, ALTOUGH IT HASN'T BEEN TESTED.**
+
+---
+
 # Spotilyrics
 
 With the removal of the Lyrics feature from Spotify, i've decided to hack together a tool to sort of replace that, and with that came Spotilyrics, it automatically fetch and shows you the lyrics from the songs you are listening, and even allows you to pause or skip a song.
